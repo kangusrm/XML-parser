@@ -2,6 +2,8 @@
 Ročníkový projekt
 Flasková aplikace pro parsování a import XLM feedu do prestashopu.
 TO DO:
-1) Získat výchozí soubory od Ing. Petr Grussmann
-2) Zpracovat soubory
-3) To be decided
+<ol>
+  <li>Získat výchozí soubory od Ing. Petr Grussmann</li>
+  <li>Zpracovat soubory</li>
+  <li>To be decided</li>
+</ol>
