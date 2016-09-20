@@ -1,5 +1,4 @@
-<h1>XMLFeed</h1>
-<h2>Ročníkový projekt</h2>
+<h1>Ročníkový projekt</h1>
 <p>Flasková aplikace pro parsování a import XLM feedu do prestashopu.</p>
 TO DO:
 <ol>
