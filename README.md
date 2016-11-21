@@ -8,3 +8,4 @@
 </ol>
 <h2>Výchozí soubory</h2>
 <p>https://github.com/petrgru/remenarna-api</p>
+<p>https://github.com/realpython/flask-skeleton</p>
