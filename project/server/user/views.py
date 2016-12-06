@@ -13,7 +13,7 @@ from project.server import bcrypt, db
 from project.server.models import User
 from project.server.user.forms import LoginForm, RegisterForm
 
-from bs4 import BeautifulSoup
+import xml.etree.ElementTree as ET
 
 ################
 #### config ####
@@ -83,14 +83,24 @@ def xmlparser():
         if 'file' not in request.files:
             flash('No file part')
             return redirect(request.url)
+
         file = request.files['file']
         # if user does not select file, browser also
         # submit a empty part without filename
         if file.filename == '':
             flash('No selected file')
             return redirect(request.url)
+
         if file:
-            return '<h1>EZ</h1>'
-    ##file = request.files['file']##
-    ##soup = BeautifulSoup(open(file), "xml")##
+            tree = ET.parse(file)
+            root = tree.getroot()
+            vystup = "<html><table border='1px solid black'>"
+            for child in root:
+                vystup += "<tr>"
+                for tag in child:
+                    vystup += "<td>"+tag.text+"</td>"
+                vystup += "</tr>"
+            vystup += "</table></html>"
+            return vystup
+
     return render_template('user/xmlparser.html')
