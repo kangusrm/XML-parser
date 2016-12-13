@@ -97,16 +97,20 @@ def xmlparser():
             radky = 0
             sloupce = 0
 
-            vystup = "<table class='table'>"
+            vystup = "<table class='table'><tr>"
+            vystup1=""
             for child in root:
                 sloupce = 0
-                vystup += "<tr>"
+                vystup1 += "<tr>"
                 for tag in child:
-                    vystup += "<td>"+root[radky][sloupce].text+"</td>"
+                    vystup1 += "<td>"+root[radky][sloupce].text+"</td>"
                     sloupce += 1
                 radky += 1
-                vystup += "</tr>"
-            vystup += "</table>"
+                vystup1 += "</tr>"
+            vystup1 += "</table>"
+            for x in range(0,sloupce):
+                vystup += "<th>"+root[0][x].tag+"</th>"
+            vystup += "</tr>" + vystup1
             return render_template('user/xmlparser.html',vystup=vystup)
 
     return render_template('user/xmlparser.html')
