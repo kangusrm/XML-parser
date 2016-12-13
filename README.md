@@ -4,7 +4,11 @@
 <ol>
   <li>Získat výchozí soubory od Ing. Petr Grussmann | DONE</li>
   <li>Zprovoznit flask na Windows | DONE</li>
-  <li>Zpracovávání souborů | In progress</li>
+  <li>Zpracovávání souborů | DONE</li>
+  <ul>
+    <li>test</li>
+  </ul>
+  <li></li>
   <li>TBD</li>
 </ol>
 <h2>Výchozí soubory</h2>
