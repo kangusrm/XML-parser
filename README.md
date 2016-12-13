@@ -10,7 +10,7 @@
     <li>Zpracování dat | DONE</li>
     <li>Formátování výstupních dat | In progress</li>
   </ul>
-  <li>Import dat do databáze</li>
+  <li>Import do databáze</li>
   <li>TBD</li>
 </ol>
 <h2>Výchozí soubory</h2>
