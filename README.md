@@ -4,10 +4,10 @@
 <ol>
   <li>Získat výchozí soubory od Ing. Petr Grussmann | DONE</li>
   <li>Zprovoznit flask na Windows | DONE</li>
-  <li>Zpracovávání souborů | In progress</li>
+  <li>Zpracování souborů | In progress</li>
   <ul>
     <li>Nahrání souboru | DONE</li>
-    <li>Zpracování dat | DONE</li>
+    <li>Zpracování vstupních dat | DONE</li>
     <li>Formátování výstupních dat | In progress</li>
   </ul>
   <li>Import do databáze</li>
