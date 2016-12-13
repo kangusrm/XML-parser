@@ -94,13 +94,19 @@ def xmlparser():
         if file:
             tree = ET.parse(file)
             root = tree.getroot()
-            vystup = "<html><table border='1px solid black'>"
+            radky = 0
+            sloupce = 0
+
+            vystup = "<table class='table'>"
             for child in root:
+                sloupce = 0
                 vystup += "<tr>"
                 for tag in child:
-                    vystup += "<td>"+tag.text+"</td>"
+                    vystup += "<td>"+root[radky][sloupce].text+"</td>"
+                    sloupce += 1
+                radky += 1
                 vystup += "</tr>"
-            vystup += "</table></html>"
-            return vystup
+            vystup += "</table>"
+            return render_template('user/xmlparser.html',vystup=vystup)
 
     return render_template('user/xmlparser.html')
