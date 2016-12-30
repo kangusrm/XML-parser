@@ -10,7 +10,7 @@ from flask import render_template, Blueprint, url_for, \
 from flask_login import login_user, logout_user, login_required
 
 from project.server import bcrypt, db
-from project.server.models import User
+from project.server.models import User, Data
 from project.server.user.forms import LoginForm, RegisterForm
 
 import xml.etree.ElementTree as ET
@@ -94,23 +94,41 @@ def xmlparser():
         if file:
             tree = ET.parse(file)
             root = tree.getroot()
-            radky = 0
-            sloupce = 0
 
-            vystup = "<table class='table'><tr>"
-            vystup1=""
+            radky = 0
             for child in root:
                 sloupce = 0
-                vystup1 += "<tr>"
                 for tag in child:
-                    vystup1 += "<td>"+root[radky][sloupce].text+"</td>"
                     sloupce += 1
                 radky += 1
-                vystup1 += "</tr>"
-            vystup1 += "</table>"
+
+            tagy = []
             for x in range(0,sloupce):
-                vystup += "<th>"+root[0][x].tag+"</th>"
-            vystup += "</tr>" + vystup1
-            return render_template('user/xmlparser.html',vystup=vystup)
+                tagy.append(root[0][x].tag)
+
+            data = Data(radky)
+
+            radkyX = 0
+            for child in root:
+                sloupceY = 0
+                if(child.attrib != "{}"):
+                    attributy1 = 0
+                    for key in child.attrib:
+                        tagy.append(key)
+                        data.setData(radkyX, key, child.attrib[key])
+                        attributy1 += 1
+                attributy2 = 0
+                for tag in child:
+                    data.setData(radkyX,root[radkyX][sloupceY].tag,root[radkyX][sloupceY].text)
+                    if (tag.attrib != "{}"):
+                        for key in tag.attrib:
+                            tagy.append(key)
+                            data.setData(radkyX, key, tag.attrib[key])
+                            attributy2 += 1
+                    sloupceY += 1
+                radkyX += 1
+                sloupce = sloupceY + attributy1 + attributy2
+
+            return render_template('user/xmlparser.html',data=data,tagy=tagy,sloupce=sloupce,radky=radky)
 
     return render_template('user/xmlparser.html')
