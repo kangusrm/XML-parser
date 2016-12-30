@@ -8,9 +8,14 @@
   <ul>
     <li>Nahrání souboru | DONE</li>
     <li>Zpracování vstupních dat | DONE</li>
-    <li>Formátování výstupních dat | In progress</li>
+    <li>Formátování výstupních dat | DONE</li>
   </ul>
   <li>Import do databáze</li>
+  <ul>
+    <li>Připojení k databázi</li>
+    <li>Nastavení importu</li>
+    <li>Import dat do databáze</li>
+  </ul>
   <li>TBD</li>
 </ol>
 <h2>Výchozí soubory</h2>
