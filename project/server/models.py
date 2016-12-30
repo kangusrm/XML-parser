@@ -38,3 +38,20 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User {0}>'.format(self.email)
+
+
+class Data():
+
+    pole = []
+
+    def __init__(self, pocetRadku):
+        self.pole = [{} for x in range(pocetRadku)]
+
+    def setData(self, radek, key, value):
+        self.pole[radek][key] = value
+
+    def getData(self, radek, key):
+        return self.pole[radek][key]
+
+    def __repr__(self):
+        return '<Data>'
