@@ -6,9 +6,9 @@
   <li>Zprovoznit flask na Windows | DONE</li>
   <li>Zpracování souborů | DONE</li>
   <ul>
-    <li>Nahrání souboru | DONE</li>
-    <li>Zpracování vstupních dat | DONE</li>
-    <li>Formátování výstupních dat | DONE</li>
+    <li>Nahrání souboru</li>
+    <li>Zpracování vstupních dat</li>
+    <li>Formátování výstupních dat</li>
   </ul>
   <li>Import do databáze</li>
   <ul>
