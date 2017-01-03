@@ -110,24 +110,24 @@ def xmlparser():
             data = Data(radky)
 
             radkyX = 0
+            attributy1 = 0
+            attributy2 = 0
             for child in root:
                 sloupceY = 0
-                if(child.attrib != "{}"):
-                    attributy1 = 0
+                if child.attrib != "{}":
                     for key in child.attrib:
-                        if (radkyX == 0):
+                        if not key in tagy:
                             tagy.append(key)
+                            attributy1 += 1
                         data.setData(radkyX, key, child.attrib[key])
-                        attributy1 += 1
-                attributy2 = 0
                 for tag in child:
                     data.setData(radkyX, root[radkyX][sloupceY].tag, root[radkyX][sloupceY].text)
-                    if (tag.attrib != "{}"):
+                    if tag.attrib != "{}":
                         for key in tag.attrib:
-                            if (radkyX == 0):
+                            if not key in tagy:
                                 tagy.append(key)
+                                attributy2 += 1
                             data.setData(radkyX, key, tag.attrib[key])
-                            attributy2 += 1
                     sloupceY += 1
                 radkyX += 1
                 sloupce = sloupceY + attributy1 + attributy2
