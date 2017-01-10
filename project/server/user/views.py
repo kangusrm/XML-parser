@@ -6,7 +6,7 @@
 #################
 
 from flask import render_template, Blueprint, url_for, \
-    redirect, flash, request, jsonify
+    redirect, flash, request
 from flask_login import login_user, logout_user, login_required
 
 from project.server import bcrypt, db
@@ -81,12 +81,6 @@ def members():
 @user_blueprint.route('/xmlparser', methods=['POST', 'GET'])
 @login_required
 def xmlparser():
-    ##conn = pymysql.connect(host=request.form['host'], user=request.form['user'], password=request.form['password'],##
-    ## db=request.form['database'], cursorclass=pymysql.cursors.DictCursor)##
-    ##a = conn.cursor()##
-    ##sql = 'CREATE TABLE `users` (`id` int(11) NOT NULL AUTO_INCREMENT,`email` varchar(255) NOT NULL,`password` varchar(255) NOT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;'##
-    ##a.execute(sql)##
-
     file = open(request.form['file'], "r")
 
     tree = ET.parse(file)
@@ -158,9 +152,9 @@ def xmlparser():
     try:
         a.execute(sql)
         conn.commit()
-        flash('Success')
+        flash('Success', 'success')
     except:
-        flash('Unexpected error')
+        flash('Unexpected error', 'danger')
 
     return render_template('user/select.html')
 
@@ -174,12 +168,12 @@ def select():
 @login_required
 def select_process():
     if 'file' not in request.files:
-        flash('No file part')
+        flash('No file part', 'danger')
         return render_template('user/select.html')
 
     file = request.files['file']
     if file.filename == '':
-        flash('No selected file')
+        flash('No selected file', 'danger')
         return render_template('user/select.html')
 
     filename = file.filename
