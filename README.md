@@ -10,13 +10,12 @@
     <li>Zpracování vstupních dat</li>
     <li>Formátování výstupních dat</li>
   </ul>
-  <li>Import do databáze</li>
+  <li>Import do databáze | DONE</li>
   <ul>
     <li>Připojení k databázi</li>
     <li>Nastavení importu</li>
     <li>Import dat do databáze</li>
   </ul>
-  <li>TBD</li>
 </ol>
 <h2>Výchozí soubory</h2>
 <p>https://github.com/petrgru/remenarna-api</p>
