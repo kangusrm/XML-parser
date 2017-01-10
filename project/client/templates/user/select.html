@@ -1,0 +1,39 @@
+{% extends "_base.html" %}
+{% block content %}
+<script>
+            $(function() {
+              // We can attach the `fileselect` event to all file inputs on the page
+              $(document).on('change', ':file', function() {
+                var input = $(this),
+                    numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                    label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+                input.trigger('fileselect', [numFiles, label]);
+              });
+              // We can watch for our custom `fileselect` event like this
+              $(document).ready( function() {
+                  $(':file').on('fileselect', function(event, numFiles, label) {
+                      var input = $(this).parents('.input-group').find(':text'),
+                          log = numFiles > 1 ? numFiles + ' files selected' : label;
+
+                      if( input.length ) {
+                          input.val(log);
+                      } else {
+                          if( log ) alert(log);
+                      }
+                  });
+              });
+            });
+</script>
+<h1>Welcome, <em>{{ current_user.email }}</em>!</h1>
+<form id=upload-form action="{{ url_for('user.select_process') }}" method=post enctype=multipart/form-data>
+    <div class="input-group">
+        <label class="input-group-btn">
+                <span class="btn btn-primary">
+                    Browse&hellip; <input type=file name=file id=file style="display: none;">
+                </span>
+        </label>
+        <input type="text" class="form-control" readonly>
+    </div>
+    <input class="btn btn-basic" type=submit value=Upload>
+</form>
+{% endblock %}

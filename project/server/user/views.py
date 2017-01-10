@@ -6,7 +6,7 @@
 #################
 
 from flask import render_template, Blueprint, url_for, \
-    redirect, flash, request
+    redirect, flash, request, jsonify
 from flask_login import login_user, logout_user, login_required
 
 from project.server import bcrypt, db
@@ -14,12 +14,15 @@ from project.server.models import User, Data
 from project.server.user.forms import LoginForm, RegisterForm
 
 import xml.etree.ElementTree as ET
+import pymysql
+import pymysql.cursors
+import tempfile
 
 ################
 #### config ####
 ################
 
-user_blueprint = Blueprint('user', __name__,)
+user_blueprint = Blueprint('user', __name__, )
 
 
 ################
@@ -75,63 +78,153 @@ def members():
     return render_template('user/members.html')
 
 
-@user_blueprint.route('/xmlparser', methods=['GET', 'POST'])
+@user_blueprint.route('/xmlparser', methods=['POST', 'GET'])
 @login_required
 def xmlparser():
-    if request.method == 'POST':
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
+    ##conn = pymysql.connect(host=request.form['host'], user=request.form['user'], password=request.form['password'],##
+    ## db=request.form['database'], cursorclass=pymysql.cursors.DictCursor)##
+    ##a = conn.cursor()##
+    ##sql = 'CREATE TABLE `users` (`id` int(11) NOT NULL AUTO_INCREMENT,`email` varchar(255) NOT NULL,`password` varchar(255) NOT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;'##
+    ##a.execute(sql)##
 
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
+    file = open(request.form['file'], "r")
 
-        if file:
-            tree = ET.parse(file)
-            root = tree.getroot()
+    tree = ET.parse(file)
+    root = tree.getroot()
 
-            radky = 0
-            for child in root:
-                sloupce = 0
-                for tag in child:
-                    sloupce += 1
-                radky += 1
+    tagy = []
+    radky = 0
+    for child in root:
+        sloupce = 0
+        for tag in child:
+            if root[radky][sloupce].tag not in tagy:
+                tagy.append(root[radky][sloupce].tag)
+            sloupce += 1
+        radky += 1
 
-            attributy = 0
-            tagy = []
-            for x in range(0,sloupce):
-                tagy.append(root[0][x].tag)
+    data = Data(radky)
 
-            data = Data(radky)
+    radkyX = 0
+    attributy1 = 0
+    attributy2 = 0
 
-            radkyX = 0
-            attributy1 = 0
-            attributy2 = 0
-            for child in root:
-                sloupceY = 0
-                if child.attrib != "{}":
-                    for key in child.attrib:
-                        if not key in tagy:
-                            tagy.append(key)
-                            attributy1 += 1
-                        data.setData(radkyX, key, child.attrib[key])
-                for tag in child:
-                    data.setData(radkyX, root[radkyX][sloupceY].tag, root[radkyX][sloupceY].text)
-                    if tag.attrib != "{}":
-                        for key in tag.attrib:
-                            if not key in tagy:
-                                tagy.append(key)
-                                attributy2 += 1
-                            data.setData(radkyX, key, tag.attrib[key])
-                    sloupceY += 1
-                radkyX += 1
-                sloupce = sloupceY + attributy1 + attributy2
+    for child in root:
+        sloupceY = 0
+        if child.attrib != "{}":
+            for key in child.attrib:
+                if not key in tagy:
+                    tagy.append(key)
+                    attributy1 += 1
+                data.setData(radkyX, key, child.attrib[key])
+        for tag in child:
+            data.setData(radkyX, root[radkyX][sloupceY].tag, root[radkyX][sloupceY].text)
+            if tag.attrib != "{}":
+                for key in tag.attrib:
+                    if not key in tagy:
+                        tagy.append(key)
+                        attributy2 += 1
+                    data.setData(radkyX, key, tag.attrib[key])
+            sloupceY += 1
+        radkyX += 1
+        sloupce = sloupceY + attributy1 + attributy2
 
-            return render_template('user/xmlparser.html',data=data,tagy=tagy,sloupce=sloupce,radky=radky)
+    sql = 'INSERT INTO `' + request.form['table'] + '` ('
+    for tag in tagy:
+        if request.form[tag] != "":
+            if sql == 'INSERT INTO `' + request.form['table'] + '` (':
+                sql += request.form[tag]
+            else:
+                sql += ',' + request.form[tag]
+    sql += ')\nVALUES '
+    for x in range(0,radky):
+        prvni = True
+        if x == 0:
+            sql += "("
+        else:
+            sql += ",("
+        for tag in tagy:
+            if request.form[tag] != "":
+                if prvni == True:
+                    sql += "'" + data.getData(x,tag) + "'"
+                    prvni = False
+                else:
+                    sql += ",'" + data.getData(x,tag) + "'"
+        sql += ")"
+    sql += ";"
 
-    return render_template('user/xmlparser.html')
+    conn = pymysql.connect(host=request.form['host'], user=request.form['user'], password=request.form['password'],
+                               db=request.form['database'], cursorclass=pymysql.cursors.DictCursor)
+    a = conn.cursor()
+    try:
+        a.execute(sql)
+        conn.commit()
+        flash('Success')
+    except:
+        flash('Unexpected error')
+
+    return render_template('user/select.html')
+
+@user_blueprint.route('/select', methods=['POST', 'GET'])
+@login_required
+def select():
+    return render_template('user/select.html')
+
+
+@user_blueprint.route('/select_process', methods=['POST', 'GET'])
+@login_required
+def select_process():
+    if 'file' not in request.files:
+        flash('No file part')
+        return render_template('user/select.html')
+
+    file = request.files['file']
+    if file.filename == '':
+        flash('No selected file')
+        return render_template('user/select.html')
+
+    filename = file.filename
+    target = tempfile.gettempdir()
+    destination = "/".join([target, filename])
+    file.save(destination)
+
+    file = open(destination,"r")
+
+    tree = ET.parse(file)
+    root = tree.getroot()
+
+    tagy = []
+    radky = 0
+    for child in root:
+        sloupce = 0
+        for tag in child:
+            if root[radky][sloupce].tag not in tagy:
+                tagy.append(root[radky][sloupce].tag)
+            sloupce += 1
+        radky += 1
+
+    data = Data(radky)
+
+    radkyX = 0
+    attributy1 = 0
+    attributy2 = 0
+    for child in root:
+        sloupceY = 0
+        if child.attrib != "{}":
+            for key in child.attrib:
+                if not key in tagy:
+                    tagy.append(key)
+                    attributy1 += 1
+                data.setData(radkyX, key, child.attrib[key])
+        for tag in child:
+            data.setData(radkyX, root[radkyX][sloupceY].tag, root[radkyX][sloupceY].text)
+            if tag.attrib != "{}":
+                for key in tag.attrib:
+                    if not key in tagy:
+                        tagy.append(key)
+                        attributy2 += 1
+                    data.setData(radkyX, key, tag.attrib[key])
+            sloupceY += 1
+        radkyX += 1
+        sloupce = sloupceY + attributy1 + attributy2
+
+    return render_template('user/xmlparser.html', data=data, tagy=tagy, sloupce=sloupce, file=destination)

@@ -1,19 +1,22 @@
 {% extends "_base.html" %}
-
 {% block content %}
   <h1>Welcome, <em>{{ current_user.email }}</em>!</h1>
-  <form action="" method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=Upload>
-  </form>
-{% if data %}
-    <table class="table-bordered">
-        <tr>{% for x in range(0,sloupce) %}<th>{{ tagy[x] }}</th>{% endfor %}</tr>
-        {% for x in range(0,radky) %}
+    <form action="{{ url_for('user.xmlparser') }}" method=post enctype=multipart/form-data>
+        File: <input type=text name=file id=file value="{{ file }}" readonly><br>
+        Host: <input type=text name=host id=host><br>
+        User: <input type=text name=user id=user><br>
+        Password: <input type=text name=password id=password><br>
+        Database: <input type=text name=database id=database><br>
+        Table: <input type=text name=table id=table><br>
+        <table class="table-bordered">
+            <tr>{% for x in range(0,sloupce) %}<th>{{ tagy[x] }}</th>{% endfor %}</tr>
             <tr>
-                {% for i in range(0,sloupce) %}<td>{{ data.getData(x,tagy[i]) }}</td>{% endfor %}
+                {% for x in range(0,sloupce) %}<td>{{ data.getData(0,tagy[x]) }}</td>{% endfor %}
             </tr>
-        {% endfor %}
-    </table>
-{% endif %}
+            <tr>
+                {% for x in range(0,sloupce) %}<td><input type=text name={{tagy[x]}}></td>{% endfor %}
+            </tr>
+        </table>
+        <input class="btn btn-lg btn-primary btn-block" type=submit value=Submit>
+    </form>
 {% endblock %}
