@@ -1,5 +1,5 @@
-<h1>XML parser</h1>
-<h2>Ročníkový projekt</h2>
+<h1>Ročníkový projekt</h1>
+<h2>XML parser</h2>
 <p>Flasková aplikace pro import dat z XML souboru do databáze.</p>
 <h3>To do</h3>
 <ol>
