@@ -1,6 +1,7 @@
-<h1>Ročníkový projekt</h1>
+<h1>XML parser</h1>
+<h2>Ročníkový projekt</h2>
 <p>Flasková aplikace pro import dat z XML souboru do databáze.</p>
-<h2>To do</h2>
+<h3>To do</h3>
 <ol>
   <li>Získat výchozí soubory od Ing. Petr Grussmann | DONE</li>
   <li>Zprovoznit flask na Windows | DONE</li>
