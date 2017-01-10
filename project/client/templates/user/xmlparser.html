@@ -8,15 +8,17 @@
         Password: <input type=text name=password id=password><br>
         Database: <input type=text name=database id=database><br>
         Table: <input type=text name=table id=table><br>
-        <table class="table-bordered">
-            <tr>{% for x in range(0,sloupce) %}<th>{{ tagy[x] }}</th>{% endfor %}</tr>
-            <tr>
-                {% for x in range(0,sloupce) %}<td>{{ data.getData(0,tagy[x]) }}</td>{% endfor %}
-            </tr>
-            <tr>
-                {% for x in range(0,sloupce) %}<td><input type=text name={{tagy[x]}}></td>{% endfor %}
-            </tr>
-        </table>
+        <div class="table-responsive">
+            <table class="table-bordered">
+                <tr>{% for x in range(0,sloupce) %}<th>{{ tagy[x] }}</th>{% endfor %}</tr>
+                <tr>
+                    {% for x in range(0,sloupce) %}<td>{{ data.getData(0,tagy[x]) }}</td>{% endfor %}
+                </tr>
+                <tr>
+                    {% for x in range(0,sloupce) %}<td><input type=text name={{tagy[x]}}></td>{% endfor %}
+                </tr>
+            </table>
+        </div>
         <input class="btn btn-lg btn-primary btn-block" type=submit value=Submit>
     </form>
 {% endblock %}
