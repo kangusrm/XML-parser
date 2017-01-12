@@ -111,18 +111,17 @@ def xmlparser():
                     if not key in tagy:
                         tagy.append(key)
                         attributy1 += 1
-                    data.setData(radkyX, key, child.attrib[key])
+                    data.setData(radkyX, key, child.attrib[key].translate(str.maketrans({"'":  r"\'", "\"": r"\""})))
             for tag in child:
-                data.setData(radkyX, root[radkyX][sloupceY].tag, root[radkyX][sloupceY].text)
+                data.setData(radkyX, root[radkyX][sloupceY].tag, root[radkyX][sloupceY].text.translate(str.maketrans({"'":  r"\'", "\"": r"\""})))
                 if tag.attrib != "{}":
                     for key in tag.attrib:
                         if not key in tagy:
                             tagy.append(key)
                             attributy2 += 1
-                        data.setData(radkyX, key, tag.attrib[key])
+                        data.setData(radkyX, key, tag.attrib[key].translate(str.maketrans({"'":  r"\'", "\"": r"\""})))
                 sloupceY += 1
             radkyX += 1
-            sloupce = sloupceY + attributy1 + attributy2
 
         sql = 'INSERT INTO `' + request.form['table'] + '` ('
         for tag in tagy:
@@ -157,7 +156,7 @@ def xmlparser():
         conn.commit()
         flash('Success', 'success')
     except:
-        flash('Unexpected error', 'danger')
+        flash('Unexpected error'+sql, 'danger')
 
     return render_template('user/select.html')
 
