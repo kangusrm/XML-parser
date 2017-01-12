@@ -17,6 +17,7 @@
     <li>Nastavení importu</li>
     <li>Import dat do databáze</li>
   </ul>
+  <li>Oprava bugů | In progress</li>
 </ol>
 <h2>Výchozí soubory</h2>
 <p>https://github.com/petrgru/remenarna-api</p>
