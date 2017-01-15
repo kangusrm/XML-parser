@@ -83,7 +83,9 @@ def members():
 @login_required
 def xmlparser():
     try:
-        file = open(request.form['file'], "r")
+        target = tempfile.gettempdir()
+        destination = "/".join([target, request.form['file']])
+        file = open(destination, "r")
 
         tree = ET.parse(file)
         root = tree.getroot()
@@ -111,15 +113,15 @@ def xmlparser():
                     if not key in tagy:
                         tagy.append(key)
                         attributy1 += 1
-                    data.setData(radkyX, key, child.attrib[key].translate(str.maketrans({"'":  r"\'", "\"": r"\""})))
+                    data.setData(radkyX, key, child.attrib[key].translate(str.maketrans({"'": r"\'", "\"": r"\""})))
             for tag in child:
-                data.setData(radkyX, root[radkyX][sloupceY].tag, root[radkyX][sloupceY].text.translate(str.maketrans({"'":  r"\'", "\"": r"\""})))
+                data.setData(radkyX, root[radkyX][sloupceY].tag, root[radkyX][sloupceY].text.translate(str.maketrans({"'": r"\'", "\"": r"\""})))
                 if tag.attrib != "{}":
                     for key in tag.attrib:
                         if not key in tagy:
                             tagy.append(key)
                             attributy2 += 1
-                        data.setData(radkyX, key, tag.attrib[key].translate(str.maketrans({"'":  r"\'", "\"": r"\""})))
+                        data.setData(radkyX, key, tag.attrib[key].translate(str.maketrans({"'": r"\'", "\"": r"\""})))
                 sloupceY += 1
             radkyX += 1
 
@@ -130,7 +132,7 @@ def xmlparser():
                     sql += request.form[tag]
                 else:
                     sql += ',' + request.form[tag]
-        sql += ')\nVALUES '
+        sql += ') VALUES '
         for x in range(0,radky):
             prvni = True
             if x == 0:
@@ -139,7 +141,7 @@ def xmlparser():
                 sql += ",("
             for tag in tagy:
                 if request.form[tag] != "":
-                    if prvni == True:
+                    if prvni is True:
                         sql += "'" + data.getData(x,tag) + "'"
                         prvni = False
                     else:
@@ -151,12 +153,12 @@ def xmlparser():
                                    db=request.form['database'], cursorclass=pymysql.cursors.DictCursor)
         a = conn.cursor()
         file.close()
-        os.remove(request.form['file'])
+        os.remove(destination)
         a.execute(sql)
         conn.commit()
         flash('Success', 'success')
     except:
-        flash('Unexpected error'+sql, 'danger')
+        flash('Unexpected error', 'danger')
 
     return render_template('user/select.html')
 
@@ -226,4 +228,4 @@ def select_process():
         flash('Unexpected error', 'danger')
         return render_template('user/select.html')
 
-    return render_template('user/xmlparser.html', data=data, tagy=tagy, sloupce=sloupce, file=destination)
+    return render_template('user/xmlparser.html', data=data, tagy=tagy, sloupce=sloupce, file=filename)
