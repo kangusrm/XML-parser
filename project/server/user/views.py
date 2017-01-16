@@ -179,6 +179,11 @@ def select_process():
     if file.filename == '':
         flash('No selected file', 'danger')
         return render_template('user/select.html')
+
+    if file.filename.rsplit('.', 1)[1].lower() not in ['xml']:
+        flash('This is not .xml file', 'danger')
+        return render_template('user/select.html')
+
     try:
         filename = file.filename
         target = tempfile.gettempdir()
