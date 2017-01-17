@@ -73,12 +73,6 @@ def logout():
     return redirect(url_for('main.home'))
 
 
-@user_blueprint.route('/members')
-@login_required
-def members():
-    return render_template('user/members.html')
-
-
 @user_blueprint.route('/xmlparser', methods=['POST', 'GET'])
 @login_required
 def xmlparser():
@@ -161,6 +155,7 @@ def xmlparser():
         flash('Unexpected error', 'danger')
 
     return render_template('user/select.html')
+
 
 @user_blueprint.route('/select', methods=['POST', 'GET'])
 @login_required
