@@ -10,7 +10,7 @@ from flask import render_template, Blueprint, url_for, \
 from flask_login import login_user, logout_user, login_required
 
 from project.server import bcrypt, db
-from project.server.models import User, Data
+from project.server.models import User, Data, prevod
 from project.server.user.forms import LoginForm, RegisterForm
 
 import xml.etree.ElementTree as ET
@@ -96,7 +96,7 @@ def xmlparser():
             sloupce = 0
             for tag in child:
                 if root[radky][sloupce].tag not in tagy:
-                    tagy.append(root[radky][sloupce].tag)
+                    tagy.append(prevod(root[radky][sloupce].tag))
                 sloupce += 1
             radky += 1
 
@@ -113,25 +113,25 @@ def xmlparser():
                     if not key in tagy:
                         tagy.append(key)
                         attributy1 += 1
-                    data.setData(radkyX, key, child.attrib[key].translate(str.maketrans({"'": r"\'", "\"": r"\""})))
+                    data.setData(radkyX, key, child.attrib[key])
             for tag in child:
-                data.setData(radkyX, root[radkyX][sloupceY].tag, root[radkyX][sloupceY].text.translate(str.maketrans({"'": r"\'", "\"": r"\""})))
+                data.setData(radkyX, root[radkyX][sloupceY].tag, root[radkyX][sloupceY].text)
                 if tag.attrib != "{}":
                     for key in tag.attrib:
                         if not key in tagy:
                             tagy.append(key)
                             attributy2 += 1
-                        data.setData(radkyX, key, tag.attrib[key].translate(str.maketrans({"'": r"\'", "\"": r"\""})))
+                        data.setData(radkyX, key, tag.attrib[key])
                 sloupceY += 1
             radkyX += 1
 
-        sql = 'INSERT INTO `' + request.form['table'] + '` ('
+        sql = 'INSERT INTO `' + prevod(request.form['table']) + '` ('
         for tag in tagy:
             if request.form[tag] != "":
-                if sql == 'INSERT INTO `' + request.form['table'] + '` (':
-                    sql += request.form[tag]
+                if sql == 'INSERT INTO `' + prevod(request.form['table']) + '` (':
+                    sql += prevod(request.form[tag])
                 else:
-                    sql += ',' + request.form[tag]
+                    sql += ',' + prevod(request.form[tag])
         sql += ') VALUES '
         for x in range(0,radky):
             prvni = True
@@ -142,10 +142,10 @@ def xmlparser():
             for tag in tagy:
                 if request.form[tag] != "":
                     if prvni is True:
-                        sql += "'" + data.getData(x,tag) + "'"
+                        sql += "'" + prevod(data.getData(x,tag)) + "'"
                         prvni = False
                     else:
-                        sql += ",'" + data.getData(x,tag) + "'"
+                        sql += ",'" + prevod(data.getData(x,tag)) + "'"
             sql += ")"
         sql += ";"
 
