@@ -55,3 +55,6 @@ class Data():
 
     def __repr__(self):
         return '<Data>'
+
+def prevod(str):
+    return str.translate(str.maketrans({"'": r"\'", "\"": r"\""}))
