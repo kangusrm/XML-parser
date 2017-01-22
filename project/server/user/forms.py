@@ -2,7 +2,7 @@
 
 
 from flask_wtf import Form
-from wtforms import StringField, PasswordField
+from wtforms import StringField, PasswordField, FileField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 
@@ -26,3 +26,13 @@ class RegisterForm(Form):
             EqualTo('password', message='Passwords must match.')
         ]
     )
+
+class UploadForm(Form):
+    file = FileField('', validators=[DataRequired()])
+
+class ConnectForm(Form):
+    host = StringField('Host', [DataRequired()])
+    user = StringField('User')
+    password = PasswordField('Password')
+    database = StringField('Database', [DataRequired()])
+    table = StringField('Table', [DataRequired()])

@@ -1,0 +1,32 @@
+{% extends '_base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+
+  <header class="content-header">
+    <h1>Connect to database</h1>
+  </header>
+
+  <br>
+
+
+  <form class="form" role="form" method="post" action="{{ url_for('user.connect') }}">
+
+    {{ form.csrf_token }}
+    {{ form.hidden_tag() }}
+    {{ wtf.form_errors(form, hiddens="only") }}
+
+
+    <div class="col-lg-4 col-sm-4">
+      {{ wtf.form_field(form.host) }}
+      {{ wtf.form_field(form.user) }}
+      {{ wtf.form_field(form.password) }}
+      {{ wtf.form_field(form.database) }}
+      {{ wtf.form_field(form.table) }}
+
+      <button class="btn btn-primary" type="submit">Connect</button>
+    </div>
+  </form>
+
+
+{% endblock content %}

@@ -6,12 +6,12 @@
 #################
 
 from flask import render_template, Blueprint, url_for, \
-    redirect, flash, request
+    redirect, flash, request, session
 from flask_login import login_user, logout_user, login_required
 
 from project.server import bcrypt, db
 from project.server.models import User, Data, prevod
-from project.server.user.forms import LoginForm, RegisterForm
+from project.server.user.forms import LoginForm, RegisterForm, UploadForm, ConnectForm
 
 import xml.etree.ElementTree as ET
 import pymysql
@@ -44,7 +44,7 @@ def register():
         login_user(user)
 
         flash('Thank you for registering.', 'success')
-        return redirect(url_for("user.members"))
+        return redirect(url_for("user.home"))
 
     return render_template('user/register.html', form=form)
 
@@ -58,7 +58,7 @@ def login():
                 user.password, request.form['password']):
             login_user(user)
             flash('You are logged in. Welcome!', 'success')
-            return redirect(url_for('user.members'))
+            return redirect(url_for('main.home'))
         else:
             flash('Invalid email and/or password.', 'danger')
             return render_template('user/login.html', form=form)
@@ -77,8 +77,17 @@ def logout():
 @login_required
 def xmlparser():
     try:
-        target = tempfile.gettempdir()
-        destination = "/".join([target, request.form['file']])
+        host = session['db_host']
+        session.pop('db_host', None)
+        user = session['db_user']
+        session.pop('db_user', None)
+        password = session['db_password']
+        session.pop('db_password', None)
+        db = session['db_database']
+        session.pop('db_database', None)
+
+        destination = session['file']
+        session.pop('file', None)
         file = open(destination, "r")
 
         tree = ET.parse(file)
@@ -119,13 +128,15 @@ def xmlparser():
                 sloupceY += 1
             radkyX += 1
 
-        sql = 'INSERT INTO `' + prevod(request.form['table']) + '` ('
+        sql = 'INSERT INTO `' + prevod(session['db_table']) + '` ('
         for tag in tagy:
             if request.form[tag] != "":
-                if sql == 'INSERT INTO `' + prevod(request.form['table']) + '` (':
+                if sql == 'INSERT INTO `' + prevod(session['db_table']) + '` (':
                     sql += prevod(request.form[tag])
                 else:
                     sql += ',' + prevod(request.form[tag])
+
+        session.pop('db_table', None)
         sql += ') VALUES '
         for x in range(0,radky):
             prvni = True
@@ -143,48 +154,62 @@ def xmlparser():
             sql += ")"
         sql += ";"
 
-        conn = pymysql.connect(host=request.form['host'], user=request.form['user'], password=request.form['password'],
-                                   db=request.form['database'], cursorclass=pymysql.cursors.DictCursor)
+        conn = pymysql.connect(host=host, user=user, password=password, db=db, cursorclass=pymysql.cursors.DictCursor)
         a = conn.cursor()
         file.close()
         os.remove(destination)
         a.execute(sql)
         conn.commit()
         flash('Success', 'success')
+        return render_template('main/home.html')
     except:
         flash('Unexpected error', 'danger')
 
-    return render_template('user/select.html')
+    return redirect(url_for("user.upload"))
 
 
-@user_blueprint.route('/select', methods=['POST', 'GET'])
+@user_blueprint.route('/upload', methods=['POST', 'GET'])
 @login_required
-def select():
-    return render_template('user/select.html')
+def upload():
+    if 'db_host' not in session:
+        form = ConnectForm(request.form)
+        return render_template('user/connect.html',form=form)
+    form = UploadForm(request.form)
+    return render_template('user/upload.html',form=form)
 
-
-@user_blueprint.route('/select_process', methods=['POST', 'GET'])
+@user_blueprint.route('/connect', methods=['POST', 'GET'])
 @login_required
-def select_process():
+def connect():
+    session['db_host'] = request.form['host']
+    session['db_user'] = request.form['user']
+    session['db_password'] = request.form['password']
+    session['db_database'] = request.form['database']
+    session['db_table'] = request.form['table']
+    return redirect(url_for("user.upload"))
+
+
+@user_blueprint.route('/process', methods=['POST', 'GET'])
+@login_required
+def process():
     if 'file' not in request.files:
         flash('No file part', 'danger')
-        return render_template('user/select.html')
+        return redirect(url_for("user.upload"))
 
     file = request.files['file']
     if file.filename == '':
         flash('No selected file', 'danger')
-        return render_template('user/select.html')
+        return redirect(url_for("user.upload"))
 
     if file.filename.rsplit('.', 1)[1].lower() not in ['xml']:
         flash('This is not .xml file', 'danger')
-        return render_template('user/select.html')
+        return redirect(url_for("user.upload"))
 
     try:
         filename = file.filename
         target = tempfile.gettempdir()
         destination = "/".join([target, filename])
         file.save(destination)
-
+        session['file'] = destination
         file = open(destination,"r")
 
         tree = ET.parse(file)
@@ -224,8 +249,18 @@ def select_process():
                 sloupceY += 1
             radkyX += 1
             sloupce = sloupceY + attributy1 + attributy2
+
+        conn = pymysql.connect(host = session['db_host'], user = session['db_user'], password = session['db_password'],
+                               db=session['db_database'], cursorclass=pymysql.cursors.DictCursor)
+        a = conn.cursor()
+        sql = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + prevod(session['db_table']) + "'"
+        a.execute(sql)
+        result = a.fetchall()
+        db_tagy = []
+        for column in result:
+            db_tagy.append(column['COLUMN_NAME'])
     except:
         flash('Unexpected error', 'danger')
-        return render_template('user/select.html')
+        return redirect(url_for("user.upload"))
 
-    return render_template('user/xmlparser.html', data=data, tagy=tagy, sloupce=sloupce, file=filename)
+    return render_template('user/xmlparser.html', data=data, tagy=tagy, db_tagy=db_tagy, sloupce=sloupce)

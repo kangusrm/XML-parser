@@ -5,7 +5,11 @@
 <div class="body-content">
   <div class="row">
     <h1>Welcome to the XML parser!</h1>
-    <p>Start by logging into the system.</p>
+    {% if current_user.is_authenticated %}
+      <p>Start by clicking on XML parser in menu.</p>
+    {% else %}
+      <p>Start by logging into the system.</p>
+    {% endif %}
   </div>
 </div>
 

@@ -1,24 +1,31 @@
 {% extends "_base.html" %}
 {% block content %}
-  <h1>Welcome, <em>{{ current_user.email }}</em>!</h1>
-    <form action="{{ url_for('user.xmlparser') }}" method=post enctype=multipart/form-data>
-        File: <input type=text name=file id=file value="{{ file }}" readonly><br>
-        Host: <input type=text name=host id=host><br>
-        User: <input type=text name=user id=user><br>
-        Password: <input type=text name=password id=password><br>
-        Database: <input type=text name=database id=database><br>
-        Table: <input type=text name=table id=table><br>
-        <div class="table-responsive">
-            <table class="table-bordered">
-                <tr>{% for x in range(0,sloupce) %}<th>{{ tagy[x] }}</th>{% endfor %}</tr>
-                <tr>
-                    {% for x in range(0,sloupce) %}<td>{{ data.getData(0,tagy[x]) }}</td>{% endfor %}
-                </tr>
-                <tr>
-                    {% for x in range(0,sloupce) %}<td><input type=text name={{tagy[x]}}></td>{% endfor %}
-                </tr>
-            </table>
-        </div>
-        <input class="btn btn-lg btn-primary btn-block" type=submit value=Submit>
-    </form>
+<header class="content-header">
+    <h1>Import setting</h1>
+</header>
+<br>
+<form id="form" role="form" class="form" action="{{ url_for('user.xmlparser') }}" method=post>
+    <table class="table-bordered">
+        <tr>
+            <th>Tag</th>
+            <th>Value</th>
+            <th>Column</th>
+        </tr>
+        {% for x in range(0,sloupce) %}
+        <tr>
+            <td>{{ tagy[x] }}</td>
+            <td>{{ data.getData(0,tagy[x]) }}</td>
+            <td>
+                <select name={{tagy[x]}} form="form">
+                    <option value="" selected></option>
+                    {% for tag in db_tagy %}
+                    <option value="{{ tag }}">{{ tag }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        {% endfor %}
+        <tr><td colspan="3"><input class="btn btn-lg btn-primary btn-block" type=submit value=Submit></td></tr>
+    </table>
+</form>
 {% endblock %}
