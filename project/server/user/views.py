@@ -260,6 +260,11 @@ def process():
         for column in result:
             db_tagy.append(column['COLUMN_NAME'])
     except:
+        session.pop('db_host', None)
+        session.pop('db_user', None)
+        session.pop('db_password', None)
+        session.pop('db_database', None)
+        session.pop('db_table', None)
         flash('Unexpected error', 'danger')
         return redirect(url_for("user.upload"))
 
