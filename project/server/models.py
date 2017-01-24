@@ -4,6 +4,12 @@
 import datetime
 
 from project.server import app, db, bcrypt
+from sqlalchemy import Table, MetaData, engine
+
+class Tabulka(db.Model):
+    def __init__(self, table):
+        self.__tablename__ = table
+        self.data = Table(table, MetaData(), autoload=True, autoload_with=engine)
 
 
 class User(db.Model):
@@ -41,9 +47,6 @@ class User(db.Model):
 
 
 class Data():
-
-    pole = []
-
     def __init__(self, pocetRadku):
         self.pole = [{} for x in range(pocetRadku)]
 

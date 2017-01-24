@@ -10,8 +10,10 @@ from flask import render_template, Blueprint, url_for, \
 from flask_login import login_user, logout_user, login_required
 
 from project.server import bcrypt, db
-from project.server.models import User, Data, prevod
+from project.server.models import User, Data, prevod, Tabulka
 from project.server.user.forms import LoginForm, RegisterForm, UploadForm, ConnectForm
+from .database import DatabaseConnection
+from sqlalchemy import update, insert
 
 import xml.etree.ElementTree as ET
 import pymysql
@@ -128,7 +130,7 @@ def xmlparser():
                 sloupceY += 1
             radkyX += 1
 
-        sql = 'INSERT INTO `' + prevod(session['db_table']) + '` ('
+        """ sql = 'INSERT INTO `' + prevod(session['db_table']) + '` ('
         for tag in tagy:
             if request.form[tag] != "":
                 if sql == 'INSERT INTO `' + prevod(session['db_table']) + '` (':
@@ -152,14 +154,19 @@ def xmlparser():
                     else:
                         sql += ",'" + prevod(data.getData(x,tag)) + "'"
             sql += ")"
-        sql += ";"
+        sql += ";" """
 
-        conn = pymysql.connect(host=host, user=user, password=password, db=db, cursorclass=pymysql.cursors.DictCursor)
+        tabulka = Tabulka(session['db_table'])
+        session.pop('db_table', None)
+        database = DatabaseConnection('mysql://'+user+':'+password+'@'+host+'/'+db)
+        #database.session.query(tabulka).\
+        insert(tabulka).values(nazev=data.getData(0,'title'))
+        """ conn = pymysql.connect(host=host, user=user, password=password, db=db, cursorclass=pymysql.cursors.DictCursor)
         a = conn.cursor()
         file.close()
         os.remove(destination)
         a.execute(sql)
-        conn.commit()
+        conn.commit() """
         flash('Success', 'success')
         return render_template('main/home.html')
     except:
